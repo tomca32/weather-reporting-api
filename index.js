@@ -1,10 +1,8 @@
-var express = require('express');
-var app = express();
+'use strict';
 
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-});
+var server = require('./api');
+var port = process.env.PORT || 3000;
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
+server.listen(port, function () {
+  console.log('Server running on port %d', port);
 });
