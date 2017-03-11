@@ -21,10 +21,20 @@ describe 'POST /measurements', ->
         done()
     return
 
-  it 'responds with 400 when a measurement without timestamp is submitted', (done) ->
+  it 'responds with 400 when a measurement without a timestamp is submitted', (done) ->
     request api
       .post '/measurements'
       .send {temperature: '21.7', dewPoint: '16.7', precipitation: '0'}
+      .expect 400
+      .end (err, res) ->
+        return done(err) if err
+        done()
+    return
+
+  it 'responds with 400 when a measurement with a nonsense timestamp is submitted', (done) ->
+    request api
+      .post '/measurements'
+      .send {timstamp: 'H4X003 lolz', temperature: '21.7', dewPoint: '16.7', precipitation: '0'}
       .expect 400
       .end (err, res) ->
         return done(err) if err
@@ -58,6 +68,22 @@ describe 'GET /measurements', ->
       .expect(200)
       .expect({timestamp: '2015-09-01T16:20:00.000Z', temperature: '27.5', dewPoint: '17.1', precipitation: '0'})
       .end (err, res) ->
+        return done(err) if err
+        done()
+    return
+
+  it 'responds with 404 when getting a measurement that does not exist', (done) ->
+    request api
+      .get '/measurements/2015-09-01T16:50:00.000Z'
+      .expect 404, (err) ->
+        return done(err) if err
+        done()
+    return
+
+  it 'responds with 400 when getting a measurement with a nonsense timestamp', (done) ->
+    request api
+      .get '/measurements/nonsense'
+      .expect 400, (err) ->
         return done(err) if err
         done()
     return
