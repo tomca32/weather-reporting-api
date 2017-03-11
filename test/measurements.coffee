@@ -22,3 +22,13 @@ describe 'POST /measurements', ->
         return done(err) if err
         done()
     return
+
+  it 'responds with 400 when any measurement value is not a number', (done) ->
+    request api
+      .post '/measurements'
+      .send {timestamp: '2015-09-01T16:00:00.000Z', temperature: 'I am wrong', dewPoint: 'As am I', precipitation: '0'}
+      .expect 400
+      .end (err, res) ->
+        return done(err) if err
+        done()
+    return
