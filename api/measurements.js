@@ -14,34 +14,36 @@ function save(req) {
 
 function saveMeasurement(body) {
   measurements[body.timestamp] = {};
-  iterateOverParams(body, measurement => measurements[body.timestamp][measurement] = body[measurement]);
+  iterateOverObject(body, (measurementName, measurementValue) => measurements[body.timestamp][measurementName] = measurementValue);
 }
 
 function validateMeasurementParams(req) {
   req.checkBody('timestamp', strings.errors.timestampRequired()).notEmpty().isISO8601();
-  iterateOverParams(req.body, (param) => {
+  iterateOverObject(req.body, (param) => {
     param !== 'timestamp' && req.checkBody(param, strings.errors.invalidMeasurementFormat()).isFloat();
   });
 }
 
-function get(measurementId) {
-  return measurements[measurementId];
+function get(time) {
+  return measurements[time] || getMeasurementsOn(time);
 }
 
-function getAll() {
-  return measurements;
+function iterateOverObject(obj, fn) {
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      fn(key, obj[key])
+    }
+  }
+}
+
+function getMeasurementsOn(time) {
+  let result = Object.keys(measurements)
+    .filter(measurement => measurement.indexOf(time) !== -1)
+    .map(measurement => measurements[measurement]);
+  return result.length ? result : void 0;
 }
 
 module.exports = {
   get: get,
-  getAll: getAll,
   save: save
 };
-
-function iterateOverParams(body, fn) {
-  for (let param in body) {
-    if (body.hasOwnProperty(param)) {
-      fn(param, body)
-    }
-  }
-}

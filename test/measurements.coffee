@@ -87,3 +87,19 @@ describe 'GET /measurements', ->
         return done(err) if err
         done()
     return
+
+  it 'returns all measurements made at a specific date', (done) ->
+    request api
+      .get '/measurements/2015-09-01'
+      .expect 200
+      .expect([
+        {timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '0'},
+        {timestamp: '2015-09-01T16:10:00.000Z', temperature: '27.3', dewPoint: '16.9', precipitation: '0'},
+        {timestamp: '2015-09-01T16:20:00.000Z', temperature: '27.5', dewPoint: '17.1', precipitation: '0'},
+        {timestamp: '2015-09-01T16:30:00.000Z', temperature: '27.4', dewPoint: '17.3', precipitation: '0'},
+        {timestamp: '2015-09-01T16:40:00.000Z', temperature: '27.2', dewPoint: '17.2', precipitation: '0'}
+      ], (err) ->
+        return done(err) if err
+        done()
+      )
+    return
