@@ -2,7 +2,7 @@
 
 const express = require('express');
 const app = express();
-const measurementRoutes = require('./measurements');
+const measurementRoutes = require('./measurementsRoutes');
 const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
 
