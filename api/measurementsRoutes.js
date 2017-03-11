@@ -2,8 +2,12 @@ const express = require('express');
 const router = express.Router();
 const measurements = require('./measurements');
 
+router.get('/measurements/:measurementId', function(req, res) {
+  res.json(measurements.get(req.params.measurementId));
+});
+
 router.post('/measurements', function (req, res) {
-  measurements.saveMeasurement(req).then(function(errors) {
+  measurements.save(req).then(function(errors) {
     if (!errors.isEmpty()) {
       return res.status(400).json({errors: errors.mapped()});
     }

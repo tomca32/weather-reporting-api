@@ -1,6 +1,22 @@
-function saveMeasurement(req) {
+let measurements = {};
+
+function save(req) {
   validateMeasurementParams(req);
-  return req.getValidationResult();
+  return req.getValidationResult().then(function(errors) {
+    if (errors.isEmpty()) {
+      saveMeasurement(req.body);
+    }
+    return errors;
+  });
+}
+
+function saveMeasurement(body) {
+  measurements[body.timestamp] = {};
+  for (let measurement in body) {
+    if (body.hasOwnProperty(measurement)) {
+      measurements[body.timestamp][measurement] = body[measurement];
+    }
+  }
 }
 
 function validateMeasurementParams(req) {
@@ -12,6 +28,16 @@ function validateMeasurementParams(req) {
   }
 }
 
+function get(measurementId) {
+  return measurements[measurementId];
+}
+
+function getAll() {
+  return measurements;
+}
+
 module.exports = {
-  saveMeasurement: saveMeasurement
+  get: get,
+  getAll: getAll,
+  save: save
 };
