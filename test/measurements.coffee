@@ -103,3 +103,11 @@ describe 'GET /measurements', ->
         done()
       )
     return
+
+  it 'responds with 404 when getting measurements from a day where no measurements were taken.', (done) ->
+    request api
+      .get '/measurements/2015-09-03'
+      .expect 404, (err) ->
+        return done(err) if err
+        done()
+    return
