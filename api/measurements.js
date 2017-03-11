@@ -1,3 +1,5 @@
+const strings = require('./strings');
+
 let measurements = {};
 
 function save(req) {
@@ -16,9 +18,9 @@ function saveMeasurement(body) {
 }
 
 function validateMeasurementParams(req) {
-  req.checkBody('timestamp', 'timestamp is required in ISO-8061 format').notEmpty().isISO8601();
+  req.checkBody('timestamp', strings.errors.timestampRequired()).notEmpty().isISO8601();
   iterateOverParams(req.body, (param) => {
-    param !== 'timestamp' && req.checkBody(param, 'all measurement values should be floating-point numbers').isFloat();
+    param !== 'timestamp' && req.checkBody(param, strings.errors.invalidMeasurementFormat()).isFloat();
   });
 }
 
