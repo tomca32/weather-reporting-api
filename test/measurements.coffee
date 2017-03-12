@@ -14,6 +14,8 @@ putMeasurement = (timestamp, measurement, status = 204) -> (cb) -> measurementsR
 
 patchMeasurement = (timestamp, measurement, status = 204) -> (cb) -> measurementsRequest('patch', measurement, timestamp).expect(status, cb)
 
+deleteMeasurement = (timestamp, status = 204) -> (cb) -> request(api).delete("/measurements/#{timestamp}").expect(status, cb)
+
 describe 'POST /measurements', ->
   it 'responds with 201 and a Location header when a new measurement is created', (done) ->
     request api
@@ -202,3 +204,26 @@ describe 'PATCH /measurements', ->
       patchMeasurement('2015-09-02T16:00:00.000Z', {timestamp: '2015-09-02T16:00:00.000Z', precipitation: '12.3'}, 404),
     ], done)
     return
+
+describe 'DELETE /measurements', ->
+  beforeEach (done) ->
+    measurements.clean()
+    async.series([
+      postMeasurement({timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '0'}),
+      postMeasurement({timestamp: '2015-09-01T16:10:00.000Z', temperature: '27.3', dewPoint: '16.9', precipitation: '0'}),
+    ], done)
+
+  it 'deletes an existing measurement', (done) ->
+    async.series([
+      deleteMeasurement('2015-09-01T16:00:00.000Z'),
+      (cb) -> request(api).get('/measurements/2015-09-01T16:00:00.000Z').expect(404, cb),
+      (cb) ->
+        request(api).get('/measurements/2015-09-01T16:10:00.000Z')
+        .expect 200
+        .expect {timestamp: '2015-09-01T16:10:00.000Z', temperature: '27.3', dewPoint: '16.9', precipitation: '0'}, cb
+    ], done);
+
+  it 'responds with 404 when trying to delete a measurement that does not exist', (done) ->
+    async.series([
+      deleteMeasurement('2015-09-01T16:20:00.000Z', 404)
+    ], done);

@@ -53,6 +53,16 @@ function update(req) {
   });
 }
 
+function deleteMeasurement(req) {
+  req.checkParams('timestamp', strings.errors.measurementNotFound(req.params.timestamp)).measurementExists();
+  return req.getValidationResult().then(function(errors) {
+    if (errors.isEmpty()) {
+      delete measurements[req.params.timestamp];
+    }
+    return errors;
+  });
+}
+
 function iterateOverObject(obj, fn) {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
@@ -81,6 +91,7 @@ module.exports = {
   save: save,
   replace: replace,
   update: update,
+  delete: deleteMeasurement,
   measurementExists: measurementExists,
   clean: clean
 };
