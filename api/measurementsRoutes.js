@@ -35,6 +35,14 @@ router.put('/measurements/:timestamp', function(req, res) {
   });
 });
 
+router.patch('/measurements/:timestamp', function(req, res) {
+  measurements.update(req).then(function(errors) {
+    if (respondIfMeasurementNonexistant(errors, res,req) || respondIfConflict(errors, res) || respondIfErrors(errors, res)) return;
+
+    res.status(204).send();
+  });
+});
+
 function respondIfErrors(errors, res) {
   if (!errors.isEmpty()) {
     res.status(400).json({errors: errors.mapped()});

@@ -40,6 +40,19 @@ function replace(req) {
   });
 }
 
+function update(req) {
+  req.checkParams('timestamp', strings.errors.measurementNotFound(req.params.timestamp)).measurementExists();
+  validateMeasurementParams(req);
+  req.checkBody('timestamp', strings.errors.timestampMismatch()).equals(req.params.timestamp);
+  return req.getValidationResult().then(function(errors) {
+    if (errors.isEmpty()) {
+      let measurement = get(req.params.timestamp);
+      iterateOverObject(req.body, (metricName, metricValue) => measurement[metricName] = metricValue);
+    }
+    return errors;
+  });
+}
+
 function iterateOverObject(obj, fn) {
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
@@ -67,6 +80,7 @@ module.exports = {
   get: get,
   save: save,
   replace: replace,
+  update: update,
   measurementExists: measurementExists,
   clean: clean
 };
