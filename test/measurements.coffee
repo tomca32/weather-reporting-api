@@ -9,6 +9,13 @@ postMeasurement = (measurement) ->
 
 postMeasurementAsync = (measurement) -> (cb) -> postMeasurement(measurement).expect(201, cb)
 
+putMeasurement = (timestamp, measurement) ->
+  request api
+    .put "/measurements/#{timestamp}"
+    .send measurement
+
+putMeasurementAsync = (timestamp, measurement, status = 204) -> (cb) -> putMeasurement(timestamp, measurement).expect(status, cb)
+
 describe 'POST /measurements', ->
   it 'responds with 201 and a Location header when a new measurement is created', (done) ->
     request api
@@ -110,4 +117,41 @@ describe 'GET /measurements', ->
       .expect 404, (err) ->
         return done(err) if err
         done()
+    return
+
+describe 'PUT /measurements', ->
+  beforeEach (done) ->
+    async.series([
+      postMeasurementAsync({timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '0'}),
+      postMeasurementAsync({timestamp: '2015-09-01T16:10:00.000Z', temperature: '27.3', dewPoint: '16.9', precipitation: '0'}),
+    ], done)
+
+  it 'replaces an existing measurement', (done) ->
+    async.series([
+      putMeasurementAsync('2015-09-01T16:00:00.000Z', {timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '15.2'}),
+      (cb) ->
+        request(api).get '/measurements/2015-09-01T16:00:00.000Z'
+          .expect 200
+          .expect {timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '15.2'}, cb
+    ], done)
+    return
+
+  it 'responds with 400 when trying to replace a measurement with invalid values', (done) ->
+    async.series([
+      putMeasurementAsync('2015-09-01T16:00:00.000Z', {timestamp: '2015-09-01T16:00:00.000Z', temperature: 'invalid value', dewPoint: '16.7', precipitation: '15.2'}, 400),
+      (cb) ->
+        request(api).get '/measurements/2015-09-01T16:00:00.000Z'
+          .expect 200
+          .expect {timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '0'}, cb
+    ], done)
+    return
+
+  it 'responds with 409 when trying to replace a measurement with mismatched timestamps', (done) ->
+    async.series([
+      putMeasurementAsync('2015-09-01T16:00:00.000Z', {timestamp: '2015-09-02T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '15.2'}, 409),
+      (cb) ->
+        request(api).get '/measurements/2015-09-01T16:00:00.000Z'
+          .expect 200
+          .expect {timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '0'}, cb
+    ], done)
     return

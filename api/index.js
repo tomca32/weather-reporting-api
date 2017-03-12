@@ -5,9 +5,10 @@ const app = express();
 const measurementRoutes = require('./measurementsRoutes');
 const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
+const measurements = require('./measurements');
 
 app.use(bodyParser.json());
-app.use(expressValidator({}));
+app.use(expressValidator());
 
 app.get('/ping', function (req, res) {
   res.send('pong');
