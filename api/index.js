@@ -8,7 +8,13 @@ const expressValidator = require('express-validator');
 const measurements = require('./measurements');
 
 app.use(bodyParser.json());
-app.use(expressValidator());
+app.use(expressValidator({
+  customValidators: {
+    measurementExists: function(value) {
+      return measurements.measurementExists(value);
+    }
+  }
+}));
 
 app.get('/ping', function (req, res) {
   res.send('pong');

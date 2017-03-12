@@ -29,6 +29,7 @@ function get(time) {
 }
 
 function replace(req) {
+  req.checkParams('timestamp', strings.errors.measurementNotFound(req.params.timestamp)).measurementExists();
   validateMeasurementParams(req);
   req.checkBody('timestamp', strings.errors.timestampMismatch()).equals(req.params.timestamp);
   return req.getValidationResult().then(function(errors) {
@@ -54,8 +55,18 @@ function getMeasurementsOn(time) {
   return result.length ? result : void 0;
 }
 
+function measurementExists(timestamp) {
+  return !!measurements[timestamp];
+}
+
+function clean() {
+  measurements = {};
+}
+
 module.exports = {
   get: get,
   save: save,
-  replace: replace
+  replace: replace,
+  measurementExists: measurementExists,
+  clean: clean
 };

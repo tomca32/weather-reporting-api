@@ -1,6 +1,7 @@
 request = require('supertest-as-promised')
 async = require('async')
 api = require('../api')
+measurements = require('../api/measurements');
 
 postMeasurement = (measurement) ->
   request api
@@ -121,6 +122,7 @@ describe 'GET /measurements', ->
 
 describe 'PUT /measurements', ->
   beforeEach (done) ->
+    measurements.clean()
     async.series([
       postMeasurementAsync({timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '0'}),
       postMeasurementAsync({timestamp: '2015-09-01T16:10:00.000Z', temperature: '27.3', dewPoint: '16.9', precipitation: '0'}),
@@ -153,5 +155,11 @@ describe 'PUT /measurements', ->
         request(api).get '/measurements/2015-09-01T16:00:00.000Z'
           .expect 200
           .expect {timestamp: '2015-09-01T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '0'}, cb
+    ], done)
+    return
+
+  it 'responds with 404 when trying to replace a measurement that does not exist', (done) ->
+    async.series([
+      putMeasurementAsync('2015-09-02T16:00:00.000Z', {timestamp: '2015-09-02T16:00:00.000Z', temperature: '27.1', dewPoint: '16.7', precipitation: '15.2'}, 404),
     ], done)
     return
