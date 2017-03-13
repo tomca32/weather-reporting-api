@@ -49,3 +49,17 @@ describe 'GET /stats', ->
       .expect(200)
       .expect([], done)
     return
+
+  it 'responds with stats for multiple metrics', (done) ->
+    request(api).get('/stats')
+      .query({stat: ['min', 'max', 'average'], metric: ['temperature', 'dewPoint', 'precipitation'], fromDateTime: '2015-09-01T16:00:00.000Z', toDateTime: '2015-09-01T17:00:00.000Z'})
+      .expect(200)
+      .expect([
+        {metric: 'temperature', stat: 'min', value: 27.1},
+        {metric: 'temperature', stat: 'max', value: 27.5},
+        {metric: 'temperature', stat: 'average', value: 27.3},
+        {metric: 'dewPoint', stat: 'min', value: 16.9},
+        {metric: 'dewPoint', stat: 'max', value: 17.3},
+        {metric: 'dewPoint', stat: 'average', value: 17.1}
+      ], done)
+    return
