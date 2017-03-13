@@ -1,4 +1,5 @@
 const strings = require('./strings');
+const pickBy = require('lodash.pickby');
 
 let measurements = {};
 
@@ -26,6 +27,13 @@ function validateMeasurementParams(req) {
 
 function get(time) {
   return measurements[time] || getMeasurementsOn(time);
+}
+
+function getInterval(from, to) {
+  return pickBy(measurements, (value, key) => {
+    const date = Date.parse(key);
+    return date >= from && date < to;
+  });
 }
 
 function replace(req) {
@@ -88,6 +96,7 @@ function clean() {
 
 module.exports = {
   get: get,
+  getInterval: getInterval,
   save: save,
   replace: replace,
   update: update,

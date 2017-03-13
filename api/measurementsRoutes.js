@@ -46,7 +46,7 @@ router.patch('/measurements/:timestamp', function(req, res) {
 router.delete('/measurements/:timestamp', function(req, res) {
   measurements.delete(req).then(function(errors) {
     if (respondIfMeasurementNonexistant(errors, res,req)) return;
-    
+
     res.status(204).send();
   });
 });
