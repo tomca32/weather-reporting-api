@@ -21,7 +21,7 @@ function filterByMetricName(measurements, metricName) {
 }
 
 function getMetricValues(measurements, metricName) {
-  return filterByMetricName(measurements, metricName).map(measurement => Number(measurement[metricName]));
+  return filterByMetricName(measurements, metricName).map(measurement => measurement[metricName]);
 }
 
 function wrapStat(metricName, statName, statValue) {

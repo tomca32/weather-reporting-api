@@ -15,7 +15,18 @@ function save(req) {
 
 function saveMeasurement(body) {
   measurements[body.timestamp] = {};
-  iterateOverObject(body, (measurementName, measurementValue) => measurements[body.timestamp][measurementName] = measurementValue);
+  saveMetrics(body);
+}
+
+function saveMetrics(body) {
+  iterateOverObject(body, (metricName, metricValue) => saveMetric(body.timestamp, metricName, metricValue));
+}
+
+function saveMetric(timestamp, metricName, metricValue) {
+  if (metricName !== 'timestamp') {
+    metricValue = Number(metricValue);
+  }
+  measurements[timestamp][metricName] = metricValue;
 }
 
 function validateMeasurementParams(req) {
@@ -54,8 +65,7 @@ function update(req) {
   req.checkBody('timestamp', strings.errors.timestampMismatch()).equals(req.params.timestamp);
   return req.getValidationResult().then(function(errors) {
     if (errors.isEmpty()) {
-      let measurement = get(req.params.timestamp);
-      iterateOverObject(req.body, (metricName, metricValue) => measurement[metricName] = metricValue);
+      iterateOverObject(req.body, (metricName, metricValue) => saveMetric(req.params.timestamp, metricName, metricValue));
     }
     return errors;
   });
