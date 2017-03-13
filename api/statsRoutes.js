@@ -6,7 +6,7 @@ const statsService = require('./statsService');
 
 router.get('/stats', function(req, res) {
   const metrics = isString(req.query.metric) ? [req.query.metric] : req.query.metric;
-  const targetMeasurements = measurements.getInterval(Date.parse(req.query.fromDateTime), Date.parse(req.query.toDateTime));
+  const targetMeasurements = measurements.getInterval(parseDate(req.query.fromDateTime), parseDate(req.query.toDateTime));
   const stats = req.query.stat;
   const result = metrics.map((metric) => {
     return stats
@@ -18,6 +18,13 @@ router.get('/stats', function(req, res) {
 
 function flatten(arr) {
   return Array.prototype.concat(...arr);
+}
+
+function parseDate(date) {
+  if (typeof date === 'undefined') {
+    return 0;
+  }
+  return Date.parse(date)
 }
 
 module.exports = router;

@@ -43,7 +43,7 @@ function get(time) {
 function getInterval(from, to) {
   return pickBy(measurements, (value, key) => {
     const date = Date.parse(key);
-    return date >= from && date < to;
+    return (from === 0 || date >= from) && (to === 0 || date < to);
   });
 }
 
