@@ -87,3 +87,9 @@ describe 'GET /stats', ->
         {metric: 'dewPoint', stat: 'average', value: 17.1}
       ], done)
     return
+
+  it 'responds with 400 if fromDateTime parameter is not a timestamp', (done) ->
+    request(api).get('/stats')
+      .query({stat: ['min', 'max', 'average'], metric: 'dewPoint', fromDateTime: 'NONSENSE', toDateTime: '2015-09-01T17:00:00.000Z'})
+      .expect(400, done)
+    return

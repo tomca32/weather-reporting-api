@@ -4,6 +4,8 @@ module.exports = {
     timestampRequired: () => 'timestamp is required in ISO-8061 format',
     measurementNotFound: (time) => `Measurement on ${time} does not exist.`,
     invalidMeasurementFormat: () => 'all measurement values should be floating-point numbers',
-    timestampMismatch: () => 'Timestamps in the url parameter and body do not match.'
+    timestampMismatch: () => 'Timestamps in the url parameter and body do not match.',
+    fromDateInvalid: () => 'fromDateTime parameter must be a valid ISO 8601 format timestamp',
+    toDateInvalid: () => 'toDateTime parameter must be a valid ISO 8601 format timestamp'
   }
 };
