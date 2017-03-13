@@ -1,18 +1,21 @@
 const statsCalculations = {
-  min: function min(measurements, metricName) {
-    return Math.min.apply(null, getMetricValues(measurements, metricName));
+  min: function min(values) {
+    return Math.min.apply(null, values);
   },
-  max: function max(measurements, metricName) {
-    return Math.max.apply(null, getMetricValues(measurements, metricName));
+  max: function max(values) {
+    return Math.max.apply(null, values);
   },
-  average: function average(measurements, metricName) {
-    const values = getMetricValues(measurements, metricName);
-    return values.reduce((sum, e) => {return sum + e}, 0) / values.length;
+  average: function average(values) {
+    return (values.reduce((sum, e) => {return sum + e}, 0) / values.length).toFixed(3);
   }
 };
 
 function getStat(measurements, metric, stat) {
-  const statValue = statsCalculations[stat](objectValues(measurements), metric);
+  const metricValues = getMetricValues(objectValues(measurements), metric);
+  if (metricValues.length === 0) {
+    return;
+  }
+  const statValue = statsCalculations[stat](metricValues, metric);
   return wrapStat(metric, stat, statValue);
 }
 
